@@ -39,9 +39,8 @@ app.post("/webhook", middleware(config), async (req, res) => {
       await handleEvent(event);
     } catch (err) {
       console.error("[handleEvent error]", err.message);
+      if (err.body) console.error("[handleEvent error body]", err.body);
       if (err.response?.data) console.error("[handleEvent error detail]", JSON.stringify(err.response.data));
-      if (err.originalMessage) console.error("[handleEvent error original]", err.originalMessage);
-      console.error(err.stack);
     }
   }
 });
