@@ -95,8 +95,17 @@ async function handleEvent(event) {
     fetchHistory(groupId, groupName, 10),
   ]);
 
-  // Claude API で回答生成
-  const reply = await generateReply(text, systemPrompt, knowledge, history);
+  // Gemini API で回答生成
+  let reply;
+  try {
+    reply = await generateReply(text, systemPrompt, knowledge, history);
+  } catch (err) {
+    console.error("[generateReply error]", err.message);
+    if (err.status) console.error("[generateReply error status]", err.status);
+    reply = err.status === 429
+      ? "現在アクセスが混み合っています。少し時間をおいてから、もう一度質問してみてください🙏"
+      : "エラーが発生し、回答を生成できませんでした。少し時間をおいてから、もう一度試してみてください🙏";
+  }
 
   // Bot の回答をスプシに記録
   await appendHistory(groupId, groupName, "Bot", "Bot", reply);
